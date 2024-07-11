@@ -70,6 +70,7 @@ async function getAllFlights(query) {
     );
     return flights;
   } catch (error) {
+    console.log(error);
     throw new AppError(
       "Cannot fetch data of all the Flights",
       StatusCodes.INTERNAL_SERVER_ERROR
