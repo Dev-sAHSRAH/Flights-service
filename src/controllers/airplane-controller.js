@@ -43,7 +43,7 @@ async function getAirplanes(req, res) {
 
 /**
  *
- * POST: /airplanes/:id
+ * GET: /airplanes/:id
  * req-body: {}
  */
 
