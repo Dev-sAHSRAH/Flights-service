@@ -52,15 +52,30 @@ class FlightRepository extends CrudRepository {
   }
 
   async updateRemainingSeats(flightId, seats, dec = true) {
-    await db.sequelize.query(addRowLockOnFlights(flightId)); //this would apply row lock
+    const transaction = await db.sequelize.transaction();
+    try {
+      await db.sequelize.query(addRowLockOnFlights(flightId)); //this would apply row lock
 
-    const flight = await Flight.findByPk(flightId);
-    if (+dec) {
-      await flight.decrement("totalSeats", { by: seats });
-    } else {
-      await flight.increment("totalSeats", { by: seats });
+      const flight = await Flight.findByPk(flightId);
+      if (+dec) {
+        await flight.decrement(
+          "totalSeats",
+          { by: seats },
+          { transaction: transaction }
+        );
+      } else {
+        await flight.increment(
+          "totalSeats",
+          { by: seats },
+          { transaction: transaction }
+        );
+      }
+      await transaction.commit();
+      return flight;
+    } catch (error) {
+      transaction.rollback();
+      throw error;
     }
-    return flight;
   }
 }
 
